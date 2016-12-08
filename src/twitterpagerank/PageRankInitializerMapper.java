@@ -28,12 +28,10 @@ public class PageRankInitializerMapper extends Mapper<Text, Text, Text, PageRank
                     ) throws IOException, InterruptedException {
         Text followee = key;
         Text follower = value;
-        List<Text> followees = new ArrayList<Text>(1);
-        followees.add(followee);
-        PageRankFollower pageRankFollower = new PageRankFollower(follower,initialPageRank,1,followees);
+        PageRankFollower pageRankFollower = new PageRankFollower(follower,initialPageRank,1,followee);
         context.write(follower, pageRankFollower);
         
-        PageRankFollower pageRankFollower2 = new PageRankFollower(followee,initialPageRank,0,new ArrayList<Text>());
+        PageRankFollower pageRankFollower2 = new PageRankFollower(followee,initialPageRank,0,new Text("null"));
         context.write(followee, pageRankFollower2);
         
     }

@@ -5,7 +5,6 @@
  */
 package twitterpagerank;
 
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -19,36 +18,39 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
  *
  * @author nizami
  */
-public class PageRank {
+public class PageRank_8NovemberPagi {
     
     public static int numIter = 3;
     
     public static void main(String[] args) throws Exception {
         String jobsPrefix = "nizami - pageRank - "+args[0]+ " - ";
         String initializationFilePath = "iteration0";
-        Configuration conf = new Configuration();
-        conf.set("mapreduce.input.keyvaluelinerecordreader.key.value.separator", "\t");//TODO sesuaikan separator dengan di spek
-        Job initializationJob = Job.getInstance(conf, jobsPrefix+"initialization");
-        initializationJob.setJarByClass(PageRank.class);
-        initializationJob.setMapperClass(PageRankInitializerMapper.class);
-        initializationJob.setCombinerClass(PageRankInitializerReducer.class);
-        initializationJob.setReducerClass(PageRankInitializerReducer.class);
-        initializationJob.setInputFormatClass(KeyValueTextInputFormat.class);
-        initializationJob.setMapOutputKeyClass(Text.class);
-        initializationJob.setMapOutputValueClass(PageRankFollower.class);
-        initializationJob.setOutputKeyClass(Text.class);
-        initializationJob.setOutputValueClass(PageRankFollower.class);
-        TextInputFormat.addInputPath(initializationJob, new Path(args[0]));
-        TextOutputFormat.setOutputPath(initializationJob, new Path(args[1]+"/"+initializationFilePath));
-        initializationJob.waitForCompletion(true);
+            
+            
+            Configuration conf4 = new Configuration();
+            conf4.set("mapreduce.input.keyvaluelinerecordreader.key.value.separator", "\t");
+            Job iterationJob_ = Job.getInstance(conf4, jobsPrefix+"iteration"+3);
+            iterationJob_.setJarByClass(PageRank_8NovemberPagi.class);
+            iterationJob_.setMapperClass(PageRankIterationMapper.class);
+            iterationJob_.setCombinerClass(PageRankIterationReducer.PageRankIteratorCombiner.class);
+            iterationJob_.setReducerClass(PageRankIterationReducer.class);
+            iterationJob_.setInputFormatClass(KeyValueTextInputFormat.class);
+            iterationJob_.setMapOutputKeyClass(Text.class);
+            iterationJob_.setMapOutputValueClass(PageRankFollower.class);
+            iterationJob_.setOutputKeyClass(Text.class);
+            iterationJob_.setOutputValueClass(PageRankFollower.class);
+            TextInputFormat.addInputPath(iterationJob_, new Path(args[1]+"/beforeiteration"+3));
+            TextOutputFormat.setOutputPath(iterationJob_, new Path(args[1]+"/iteration"+3));
+
+            iterationJob_.waitForCompletion(true);
         
-        for (int i=1;i<=numIter;i++){
+        for (int i=4;i<=numIter;i++){
             
             
             Configuration conf3 = new Configuration();
             conf3.set("mapreduce.input.keyvaluelinerecordreader.key.value.separator", "\t");
             Job beforeIterationJob = Job.getInstance(conf3, jobsPrefix+"before_iteration"+i);
-            beforeIterationJob.setJarByClass(PageRank.class);
+            beforeIterationJob.setJarByClass(PageRank_8NovemberPagi.class);
             beforeIterationJob.setMapperClass(PageRankBeforeIterationMapper.class);
             beforeIterationJob.setCombinerClass(PageRankBeforeIterationReducer.class);
             beforeIterationJob.setReducerClass(PageRankBeforeIterationReducer.class);
@@ -67,7 +69,7 @@ public class PageRank {
             Configuration conf2 = new Configuration();
             conf2.set("mapreduce.input.keyvaluelinerecordreader.key.value.separator", "\t");
             Job iterationJob = Job.getInstance(conf2, jobsPrefix+"iteration"+i);
-            iterationJob.setJarByClass(PageRank.class);
+            iterationJob.setJarByClass(PageRank_8NovemberPagi.class);
             iterationJob.setMapperClass(PageRankIterationMapper.class);
             iterationJob.setCombinerClass(PageRankIterationReducer.PageRankIteratorCombiner.class);
             iterationJob.setReducerClass(PageRankIterationReducer.class);

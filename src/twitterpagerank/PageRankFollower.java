@@ -25,27 +25,34 @@ public class PageRankFollower implements WritableComparable<PageRankFollower>{
     private Text follower;
     private DoubleWritable pageRank;
     private LongWritable n;
-    private List<Text> followees;
+    private Text followee;
     
     public PageRankFollower(){
-        follower = new Text();
-        n = new LongWritable();
-        followees = new LinkedList<Text>();
-        pageRank = new DoubleWritable();
+        follower = new Text("null");
+        n = new LongWritable(-1);
+        followee = new Text("null");
+        pageRank = new DoubleWritable(-1);
     }
     
-    public PageRankFollower(String follower,double pageRank, long n, List<Text> followees){
-        this.follower = new Text(follower);
+    public PageRankFollower(String follower,double pageRank, long n, String followee){
+        this.follower = new Text(follower==null?"null":follower);
         this.n = new LongWritable(n);
-        this.followees = followees;
+        this.followee = new Text(followee==null?"null":follower);
         this.pageRank = new DoubleWritable(pageRank);
     }
     
-    public PageRankFollower(Text follower,double pageRank, long n, List<Text> followees){
+    public PageRankFollower(Text follower,double pageRank, long n, Text followees){
         this.follower = follower;
         this.n = new LongWritable(n);
-        this.followees = followees;
+        this.followee = followees;
         this.pageRank = new DoubleWritable(pageRank);
+    }
+    
+    public PageRankFollower(PageRankFollower o){
+        setFollower(o.getFollowerString());
+        setFollowee(o.getFolloweeString());
+        setN(o.getNlong());
+        setPageRank(o.getPageRankDouble());
     }
 
     @Override
@@ -53,10 +60,7 @@ public class PageRankFollower implements WritableComparable<PageRankFollower>{
         follower.write(d);
         pageRank.write(d);
         n.write(d);
-        new LongWritable(getFollowees().size()).write(d);
-        for (Text i : getFollowees()){
-            i.write(d);
-        }
+        followee.write(d);
     }
     
     public String toString(){
@@ -64,24 +68,20 @@ public class PageRankFollower implements WritableComparable<PageRankFollower>{
                 follower.toString()+","+
                 pageRank.toString()+","+
                 n.toString()+","+
-                getFollowees().size()+",";
-        for (Text i : getFollowees()){
-            rval+=i.toString()+",";
-        }
+                followee.toString();
         return rval;
                 
     }
     
-    public void readString(String s){
+    public boolean readString(String s){
         String [] fields = s.split(",");
+        if (fields.length<4)
+            return false;
         pageRank = new DoubleWritable(Double.parseDouble(fields[1]));
         n = new LongWritable(Long.parseLong(fields[2]));
-        int followeesSize = Integer.parseInt(fields[3],10);
-        setFollowees(new ArrayList<Text>(followeesSize));
-        for (int i = 0;i<followeesSize;i++){
-            getFollowees().add(new Text(fields[i+4]));
-        }
+        followee = new Text(fields[3]);
         follower = new Text(fields[0]);
+        return true;
     }
 
     @Override
@@ -89,15 +89,7 @@ public class PageRankFollower implements WritableComparable<PageRankFollower>{
         follower.readFields(di);
         pageRank.readFields(di);
         n.readFields(di);
-        LongWritable followeesSizeWritable =  new LongWritable();
-        followeesSizeWritable.readFields(di);
-        long followeesSize = followeesSizeWritable.get();
-        followees = new ArrayList<Text>((int) followeesSize);
-        for (long i=0;i<followeesSize;i++){
-            Text followee = new Text();
-            followee.readFields(di);
-            getFollowees().add(followee);
-        }
+        followee.readFields(di);
     }
 
     @Override
@@ -160,7 +152,19 @@ public class PageRankFollower implements WritableComparable<PageRankFollower>{
      * @return the follower
      */
     public String getFollowerString() {
-        return follower.toString();
+        String followerstr = follower.toString();
+        
+        return followerstr.equals("null")?null:followerstr;
+    }
+    
+
+    /**
+     * @return the follower
+     */
+    public String getFolloweeString() {
+        String followeestr = followee.toString();
+        
+        return followeestr.equals("null")?null:followeestr;
     }
 
     /**
@@ -202,20 +206,24 @@ public class PageRankFollower implements WritableComparable<PageRankFollower>{
         this.setFollower(p2.getFollower());
         this.setPageRank(p2.getPageRankDouble());
         this.setN(this.getNlong()+p2.getNlong());
-        this.getFollowees().addAll(p2.getFollowees());
+        this.setFollowee((String)null);
     }
 
     /**
      * @return the followees
      */
-    public List<Text> getFollowees() {
-        return followees;
+    public Text getFollowee() {
+        return followee;
     }
 
     /**
      * @param followees the followees to set
      */
-    public void setFollowees(List<Text> followees) {
-        this.followees = followees;
+    public void setFollowee(Text followee) {
+        this.followee = followee;
+    }
+    
+    public void setFollowee(String followee){
+        this.followee = new Text(followee==null?"null":followee);
     }
 }

@@ -21,16 +21,17 @@ public class PageRankIterationReducer extends Reducer<Text,PageRankFollower,Text
     
     public PageRankFollower calculatePageRank(Text key, Iterable<PageRankFollower> values){
         
-        PageRankFollower result = new PageRankFollower(new Text(key.toString()), 0, 0, new ArrayList<Text>());
+        PageRankFollower result = new PageRankFollower(key.toString(), -1, -1, null);
         double newRank = 0;
         for (PageRankFollower p : values) {
             if (p.getFollower().toString().equals(key.toString()+"c")){
                 newRank += p.getPageRankDouble();
+                if (p.getNlong()>=0)
+                    result.setN(p.getNlong());
             }else if (p.getFollower().toString().equals(key.toString())){
                 newRank += (1.0-d)*(p.getPageRankDouble());
-                result.setN(p.getNlong());
-                List<Text> followees = p.getFollowees();
-                result.setFollowees(followees);
+                if (p.getNlong()>=0)
+                    result.setN(p.getNlong());
             }else{
                 newRank += (d*p.getPageRankDouble())/p.getNlong();
             }

@@ -18,7 +18,7 @@ public class PageRankInitializerReducer extends Reducer<Text, PageRankFollower, 
     
     @Override
     public void reduce(Text key, Iterable<PageRankFollower> values, Context context) throws IOException, InterruptedException {
-        PageRankFollower result = new PageRankFollower(new Text("0"), 0, 0, new ArrayList<Text>());
+        PageRankFollower result = new PageRankFollower((String) null, 0, 0, (String) null);
         for (PageRankFollower p : values) {
             result.combineFollowees(p);
         }

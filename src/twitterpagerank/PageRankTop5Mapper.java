@@ -9,15 +9,16 @@ import java.io.IOException;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author nizami
  */
 public class PageRankTop5Mapper extends Mapper<Text,Text,NullWritable,SortedPageRank> {
-    
     @Override
     public void map(Text key, Text value, Context context) throws IOException, InterruptedException{
+        
         PageRankFollower pageRankFollower = new PageRankFollower();
         pageRankFollower.readString(value.toString());
         

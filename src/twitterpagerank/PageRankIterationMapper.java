@@ -22,11 +22,8 @@ public class PageRankIterationMapper extends Mapper<Text, Text, Text, PageRankFo
                     ) throws IOException, InterruptedException {
         PageRankFollower follower = new PageRankFollower();
         follower.readString(value.toString());
+        if (follower.getFolloweeString() != null)
+            key = follower.getFollowee();
         context.write(key, follower);
-        
-        List<Text> followees = follower.getFollowees();
-        for (Text followee : followees){
-            context.write(followee, follower);
-        }
     }
 }
